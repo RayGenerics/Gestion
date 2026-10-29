@@ -1,0 +1,30 @@
+name: Build APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Instalar workload de Android (MAUI)
+        run: dotnet workload install maui-android
+
+      - name: Compilar APK de depuración
+        run: dotnet build Gestion.csproj -f net8.0-android -c Debug
+
+      - name: Subir APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: imperio-apk
+          path: '**/bin/Debug/net8.0-android/*-Signed.apk'
